@@ -1,0 +1,9 @@
+numpy==2.0.2
+pandas==2.2.3
+python-dateutil==2.9.0.post0
+pytz==2024.2
+ratelimit==2.2.1
+six==1.17.0
+tzdata==2024.2
+urllib3==2.3.0
+wiz-sdk @ https://downloads.wiz.io/customer-files/wiz-sdk-python/wiz-sdk-0.8.1.tar.gz
