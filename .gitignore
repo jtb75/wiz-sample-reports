@@ -39,7 +39,6 @@ logs/
 *.log
 
 # Local configuration
-config.py
 .env
 
 # OS specific

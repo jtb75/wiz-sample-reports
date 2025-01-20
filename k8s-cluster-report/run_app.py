@@ -104,7 +104,7 @@ class ReportFormatter:
     def __init__(self, logger: logging.Logger):
         self.logger = logger
 
-    def output_report(self, df: pd.DataFrame, output_type: str = 'table', output_file: Optional[str] = None) -> None:
+    def output_report(self, df: pd.DataFrame, output_format: str = 'table', output_file: Optional[str] = None) -> None:
         """Format and output the report"""
         format_methods = {
             'table': df.to_string,
@@ -112,19 +112,19 @@ class ReportFormatter:
             'html': lambda: df.to_html(index=False)
         }
         
-        formatted_output = format_methods[output_type]()
+        formatted_output = format_methods[output_format]()
         
         if output_file:
-            self._save_to_file(df, formatted_output, output_type, output_file)
+            self._save_to_file(df, formatted_output, output_format, output_file)
         else:
             print(formatted_output)
 
-    def _save_to_file(self, df: pd.DataFrame, formatted_output: str, output_type: str, output_file: str) -> None:
+    def _save_to_file(self, df: pd.DataFrame, formatted_output: str, output_format: str, output_file: str) -> None:
         """Save report to file"""
         try:
-            if output_type == 'csv':
+            if output_format == 'csv':
                 df.to_csv(output_file, index=False)
-            elif output_type == 'html':
+            elif output_format == 'html':
                 df.to_html(output_file, index=False)
             else:  # table format
                 with open(output_file, 'w') as f:
@@ -158,14 +158,14 @@ def parse_args():
     )
 
     parser.add_argument(
-        '--type',
+        '--format',
         choices=['table', 'csv', 'html'],
         default='table',
         help='Specify output format (table, csv, or html)'
     )
 
     parser.add_argument(
-        '--file',
+        '--output',
         help='Output file location (if not specified, output goes to stdout)'
     )
     
@@ -248,7 +248,7 @@ def main():
 
         # Create and output report
         df = pd.DataFrame(rows)
-        formatter.output_report(df, args.type, args.file)
+        formatter.output_report(df, args.format, args.output)
 
         logger.info("Application completed successfully")
     except Exception as e:
