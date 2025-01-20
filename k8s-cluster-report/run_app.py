@@ -86,7 +86,7 @@ class WizReportGenerator:
                 "Connection Status": node['status'],
                 "Admission Controller": "CONNECTED" if node['admissionController'] else "DISCONNECTED",
                 "Sensor Group": "CONNECTED" if node['sensorGroup'] else "DISCONNECTED",
-                "Kubernetes Audit Log Collector": "CONNECTED" if node['kubernetesAuditLogCollector'] else "DISCONNECTED"
+                "Audit Log Collector": "CONNECTED" if node['kubernetesAuditLogCollector'] else "DISCONNECTED"
             }
 
             if node['id'] in cluster_vulns:
