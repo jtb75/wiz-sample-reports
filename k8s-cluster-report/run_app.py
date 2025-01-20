@@ -244,10 +244,10 @@ def main():
 
         # Generate report data
         cluster_vulns = generator.get_vulnerability_data()
-        rows = generator.get_cluster_data(cluster_vulns)
+        cluster_rows = generator.get_cluster_data(cluster_vulns)
 
         # Create and output report
-        df = pd.DataFrame(rows)
+        df = pd.DataFrame(cluster_rows)
         formatter.output_report(df, args.format, args.output)
 
         logger.info("Application completed successfully")
