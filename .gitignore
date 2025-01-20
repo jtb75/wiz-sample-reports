@@ -38,9 +38,6 @@ ENV/
 logs/
 *.log
 
-# Local configuration
-.env
-
 # OS specific
 .DS_Store
 Thumbs.db
