@@ -67,8 +67,19 @@ By default, the report will be generated in table format and printed to `stdout`
 ### Report Contents
 
 The K8s cluster report includes:
-- Cluster inventory and connection details
-- Security vulnerabilities
+- Cluster inventory and connection details covering:
+  - Cluster ID
+  - Cluster Name
+  - Cluster Connection Status
+  - Cluster Sensor Status
+  - Cluster Admission Controller Status
+  - Cluster Audit Log Collector Status
+- Security vulnerabilities counts across:
+  - Critical
+  - High
+  - Medium
+  - Low
+  - Info
 
 ### Contributing
 
