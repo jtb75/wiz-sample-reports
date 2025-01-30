@@ -13,12 +13,12 @@ class Dog:
         "self" represents the instance of the class. It is used to access attributes and methods of the object.
         When you create an object (dog1 = Dog("Buddy", "Golden Retriever", 3)), Python automatically passes that instance (dog1) as "self" in the __init__ method.
         "self" is required in instance methods because it ensures that attributes and behaviors are tied to a specific object, not shared across all instances.
-
+        
         """
         self.name = name  # Instance variable for the dog's name
         self.breed = breed  # Instance variable for the dog's breed
         self.age = age  # Instance variable for the dog's age
-        #Without "self", we wouldn't be able to uniquely associate attributes with specific objects.
+        # Without "self", we wouldn't be able to uniquely associate attributes with specific objects.
     
     def bark(self) -> str:
         """Make the dog bark.
@@ -43,7 +43,10 @@ class Dog:
 
 # Inheritance - Creating a specialized class from the Dog class
 class GuideDog(Dog):
-    """A specialized GuideDog class that inherits from Dog."""
+    """A specialized GuideDog class that inherits from Dog.
+    
+    Inheritance allows GuideDog to reuse the attributes and methods of Dog, avoiding code duplication.
+    """
     
     def __init__(self, name: str, breed: str, age: int, trained: bool):
         """Initialize the GuideDog instance with an additional trained attribute.
@@ -53,6 +56,8 @@ class GuideDog(Dog):
             breed (str): The breed of the dog.
             age (int): The age of the dog.
             trained (bool): Whether the guide dog is trained.
+        
+        "super()" calls the parent class constructor to initialize inherited attributes instead of redefining them.
         """
         super().__init__(name, breed, age)  # Call the parent class constructor
         self.trained = trained  # Instance variable for training status
@@ -68,17 +73,24 @@ class GuideDog(Dog):
         else:
             return f"{self.name} is not trained yet!"
 
-# Example Usage
-if __name__ == "__main__":
+# Function to demonstrate example usage
+def main():
     # Create instances of Dog and GuideDog
     dog1 = Dog("Buddy", "Golden Retriever", 3)
+    dog2 = Dog("Rex", "Siberian Husky", 5)
     guide_dog = GuideDog("Rex", "Labrador", 5, trained=True)
     
     # Display basic information and behaviors
     print(dog1.bark())
     print(f"{dog1.name} is {dog1.get_age()} years old.")
+    print(f"{dog2.name} is {dog2.get_age()} years old.")
     dog1.celebrate_birthday()
+
+    print(f"{dog1.name} thinks a {dog1.breed} is a better breed than a {dog2.breed}.")
     
     # Guide dog specific behavior
     print(guide_dog.bark())
     print(guide_dog.guide())
+
+if __name__ == "__main__":
+    main()
