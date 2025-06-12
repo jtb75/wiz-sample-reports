@@ -158,14 +158,10 @@ def extract_table_data(result):
                 logger.debug(f"Sensor details - Container: {container_name}, Host: {host_name}, "
                            f"Version: {current_version}, EOL: {is_eol}, Latest: {is_latest}")
                 
-                # Truncate long names for better table display
-                container_display = container_name[:40] + '...' if len(container_name) > 40 else container_name
-                host_display = host_name[:40] + '...' if len(host_name) > 40 else host_name
-                
                 # Add flattened row combining data from all three entities
                 table_data.append([
-                    container_display,    # Container name
-                    host_display,         # Host/VM name
+                    container_name,       # Container name (full name, no truncation)
+                    host_name,           # Host/VM name (full name, no truncation)
                     tech_name,           # Technology name (Wiz Sensor)
                     current_version,     # Current sensor version
                     version_eol_date,    # End of life date
