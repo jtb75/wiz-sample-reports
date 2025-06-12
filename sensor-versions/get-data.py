@@ -136,6 +136,8 @@ def extract_table_data(result):
             if hosted_tech and container and vm:
                 logger.debug(f"Processing complete sensor relationship in node {i+1}")
                 
+
+                
                 # Extract container information
                 container_name = safe_get(container.get('name'))
                 
@@ -143,16 +145,9 @@ def extract_table_data(result):
                 host_name = safe_get(vm.get('name'))
                 vm_properties = vm.get('properties', {}) or {}
                 cloud_platform = safe_get(vm_properties.get('cloudPlatform'))
+                vm_external_id = safe_get(vm_properties.get('externalId'))
                 
-                # Extract cluster information (try multiple possible property names)
-                cluster_name = (
-                    safe_get(vm_properties.get('clusterName')) or
-                    safe_get(vm_properties.get('kubernetesClusterName')) or
-                    safe_get(vm_properties.get('eksClusterName')) or
-                    safe_get(vm_properties.get('aksClusterName')) or
-                    safe_get(vm_properties.get('gkeClusterName')) or
-                    'N/A'
-                )
+
                 
                 # Extract technology (Wiz Sensor) information
                 tech_properties = hosted_tech.get('properties', {}) or {}
@@ -166,13 +161,13 @@ def extract_table_data(result):
                 is_eol = safe_get(tech_properties.get('isVersionEndOfLife'))
                 
                 logger.debug(f"Sensor details - Container: {container_name}, Host: {host_name}, "
-                           f"Cluster: {cluster_name}, Version: {current_version}, EOL: {is_eol}, Latest: {is_latest}")
+                           f"VM External ID: {vm_external_id}, Version: {current_version}, EOL: {is_eol}, Latest: {is_latest}")
                 
                 # Add flattened row combining data from all three entities
                 table_data.append([
                     container_name,       # Container name (full name, no truncation)
                     host_name,           # Host/VM name (full name, no truncation)
-                    cluster_name,        # Kubernetes/container cluster name
+                    vm_external_id,      # VM external ID (cloud provider's unique identifier)
                     tech_name,           # Technology name (Wiz Sensor)
                     current_version,     # Current sensor version
                     version_eol_date,    # End of life date
@@ -214,7 +209,7 @@ def print_summary_table(result, show_only_eol=False, output_format='table'):
     if show_only_eol:
         logger.info("Applying EOL/non-latest filter")
         # Filter for sensors that are either not latest (row[7] == 'False') or EOL (row[8] == 'True')
-        # Note: indices shifted due to adding cluster name column
+        # Note: indices shifted due to adding VM External ID column
         table_data = [row for row in table_data if row[7] == 'False' or row[8] == 'True']
         filtered_count = len(table_data)
         logger.info(f"Filtered {original_count} sensors down to {filtered_count} problematic sensors")
@@ -223,7 +218,7 @@ def print_summary_table(result, show_only_eol=False, output_format='table'):
     headers = [
         'Container Name',    # Name of the container running Wiz Sensor
         'Host Name',         # Name of the host/VM
-        'Cluster Name',      # Name of the Kubernetes/container cluster
+        'VM External ID',    # Cloud provider's unique identifier for the VM
         'Technology',        # Should always be "Wiz Sensor"
         'Current Version',   # Currently deployed version
         'EOL Date',          # End of life date for current version
