@@ -189,137 +189,37 @@ def print_summary_table(result, show_only_eol=False, output_format='table'):
 
 
 # GraphQL query for finding Wiz Sensor deployments and their relationships
-# This query searches for HOSTED_TECHNOLOGY entities (Wiz Sensors) and follows relationships
-# to find the containers and virtual machines they run on. The relationship path is:
-# HOSTED_TECHNOLOGY (Wiz Sensor) -> CONTAINER -> VIRTUAL_MACHINE (Host)
+# This optimized query only requests the fields that are actually used by the application
+# The relationship path is: HOSTED_TECHNOLOGY (Wiz Sensor) -> CONTAINER -> VIRTUAL_MACHINE (Host)
 QUERY = """
-    query GraphSearch($query: GraphEntityQueryInput, $controlId: ID, $projectId: String!, $first: Int, $after: String, $fetchTotalCount: Boolean!, $quick: Boolean = true, $fetchPublicExposurePaths: Boolean = false, $fetchInternalExposurePaths: Boolean = false, $fetchIssueAnalytics: Boolean = false, $fetchLateralMovement: Boolean = false, $fetchCodeSource: Boolean = false, $fetchKubernetes: Boolean = false, $fetchCost: Boolean = false, $issueId: ID) {
+    query GraphSearch($query: GraphEntityQueryInput, $projectId: String!, $first: Int, $after: String, $quick: Boolean = true) {
       graphSearch(
         query: $query
-        controlId: $controlId
         projectId: $projectId
         first: $first
         after: $after
         quick: $quick
-        issueId: $issueId
       ) {
-        totalCount @include(if: $fetchTotalCount)
-        maxCountReached @include(if: $fetchTotalCount)
         pageInfo {
           endCursor
           hasNextPage
         }
         nodes {
           entities {
-            deletedAt
-            isRestricted
-            ...PathGraphEntityFragment
-            userMetadata {
-              isInWatchlist
-              isIgnored
-              note
-            }
-            technologies {
-              id
-              icon
-            }
-            cost(
-              filterBy: {timestamp: {inLast: {amount: 30, unit: DurationFilterValueUnitDays}}}
-            ) @include(if: $fetchCost) {
-              amortized
-              blended
-              unblended
-              netAmortized
-              netUnblended
-              currencyCode
-            }
-            costImpact @include(if: $fetchCost) {
-              monthly
-            }
-            publicExposures(first: 10) @include(if: $fetchPublicExposurePaths) {
-              nodes {
-                ...NetworkExposureFragment
-              }
-            }
-            otherSubscriptionExposures(first: 10) @include(if: $fetchInternalExposurePaths) {
-              nodes {
-                ...NetworkExposureFragment
-              }
-            }
-            otherVnetExposures(first: 10) @include(if: $fetchInternalExposurePaths) {
-              nodes {
-                ...NetworkExposureFragment
-              }
-            }
-            lateralMovementPaths(first: 10) @include(if: $fetchLateralMovement) {
-              nodes {
-                id
-                pathEntities {
-                  entity {
-                    ...PathGraphEntityFragment
-                  }
-                }
-              }
-            }
-            codeSourcePath(first: 10) @include(if: $fetchCodeSource) {
-              totalCount
-              nodes {
-                id
-                pathEntities {
-                  ...PathGraphEntityFragment
-                }
-              }
-            }
-            kubernetesPaths(first: 10) @include(if: $fetchKubernetes) {
-              nodes {
-                id
-                path {
-                  ...PathGraphEntityFragment
-                }
-              }
-            }
+            id
+            name
+            type
+            properties
           }
-          aggregateCount
         }
-      }
-    }
-
-    fragment PathGraphEntityFragment on GraphEntity {
-      id
-      name
-      type
-      properties
-      issueAnalytics: issues(filterBy: {status: [IN_PROGRESS, OPEN]}) @include(if: $fetchIssueAnalytics) {
-        highSeverityCount
-        criticalSeverityCount
-      }
-    }
-
-    fragment NetworkExposureFragment on NetworkExposure {
-      id
-      portRange
-      sourceIpRange
-      destinationIpRange
-      path {
-        ...PathGraphEntityFragment
-      }
-      applicationEndpoints {
-        ...PathGraphEntityFragment
       }
     }
 """
 
-# Variables for the GraphQL query
-# Most features are disabled to optimize performance since we only need basic entity data
+# Variables for the optimized GraphQL query
+# Only the essential parameters needed for the simplified query
 VARIABLES = {
   "quick": True,                        # Use quick mode for faster queries
-  "fetchPublicExposurePaths": False,    # Don't fetch network exposure data
-  "fetchInternalExposurePaths": False,  # Don't fetch internal network paths
-  "fetchIssueAnalytics": False,         # Don't fetch security issue counts
-  "fetchLateralMovement": False,        # Don't fetch lateral movement paths
-  "fetchCodeSource": False,             # Don't fetch code source information
-  "fetchKubernetes": False,             # Don't fetch Kubernetes path data
-  "fetchCost": False,                   # Don't fetch cost information
   "first": 100,                         # Number of results per page
   "query": {
     # This complex relationship query traverses the Wiz graph to find Wiz Sensors and their infrastructure
@@ -387,8 +287,7 @@ VARIABLES = {
       }
     }
   },
-  "projectId": "*",
-  "fetchTotalCount": False
+  "projectId": "*"
 }
 
 class WizClient:
